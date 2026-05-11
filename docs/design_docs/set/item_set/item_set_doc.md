@@ -1,6 +1,6 @@
 # 設定画面
 
-![設定画面](set_design.svg)
+![設定画面](item_set_design.svg)
 
 ## 画面設計
 1. ログオフボタン
