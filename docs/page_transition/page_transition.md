@@ -3,9 +3,9 @@
 graph TD
 
     classDef default fill: #fff,stroke: #333,stroke-width: 1px;
-    style funcA fill: rgb(255, 0, 0),stroke: #333,stroke-width: 1px;
-    style funcB fill: rgb(229, 255, 0),stroke: #333,stroke-width: 1px;
-    style funcC fill: rgb(51, 0, 255),stroke: #333,stroke-width: 1px;
+    style funcA fill: #ff0000,stroke: #333,stroke-width: 1px;
+    style funcB fill: #eeff00,stroke: #333,stroke-width: 1px;
+    style funcC fill: #1100ff,stroke: #333,stroke-width: 1px;
 
     subgraph funcA [ログオン]
     ログオンページ--新規登録ボタン-->新規登録ページ
