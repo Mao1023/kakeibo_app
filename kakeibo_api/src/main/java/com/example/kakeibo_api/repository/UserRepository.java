@@ -8,6 +8,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    // ユーザーIDでユーザーを検索するメソッドを定義します。
+    Optional<User> findById(Long id);
+
     // ユーザー名でユーザーを検索するメソッドを定義します。
     Optional<User> findByName(String name);
 
