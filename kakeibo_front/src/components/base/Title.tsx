@@ -12,12 +12,12 @@ export const Title: React.FC<TitleProps> = ({
   return (
     <h1 style={{
       alignItems: 'center',
-      margin: '0',
+      marginTop: '30px',
       color: '#000',
       textAlign: 'center',
       fontSize: fontSize
     }}>
-        {label}
+      {label}
     </h1>
   );
 };
