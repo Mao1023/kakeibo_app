@@ -1,22 +1,21 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 import { Button } from "../base/Button";
 
-interface logoutButtonProps {
-    label: string;
-    fontSize?: string;
-    width?: string;
-    padding?: string;
-    onClick?: () => void;
+interface LogoutButtonProps {
 }
 
-export const logoutButton: React.FC<logoutButtonProps> = ({
-    label,
-    fontSize = '20px',
-    width = '150px',
-    padding = '10px',
-    onClick
-}) => {
+export const LogoutButton: React.FC<LogoutButtonProps> = () => {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        navigate('/logon', { replace: true });
+    };
+
     return (
-        <Button label='ログオフ' />
+        <div style={{ position: 'fixed', right: '50px', top: '50px' }}>
+            <Button label='ログオフ' onClick={handleLogout} />
+        </div>
     );
 };

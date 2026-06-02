@@ -16,6 +16,7 @@ export const Logon: React.FC = () => {
   // 各入力欄のエラーメッセージのステート
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [logonError, setLogonError] = useState('');
 
   // ユーザー名の入力バリデーション
   const handleUsernameChange = (val: string) => {
@@ -51,19 +52,25 @@ export const Logon: React.FC = () => {
     let hasError = false;
     if (username.trim() === '') { setUsernameError('ユーザー名を入力してください。'); hasError = true; }
     if (password.trim() === '') { setPasswordError('パスワードを入力してください。'); hasError = true; }
-    if (usernameError || passwordError) { hasError = true; }
-    if (!hasError) { navigate('/menu'); }
+    if (usernameError || passwordError || logonError) { hasError = true; }
+    if ((username !== '' || password !== '') && (username !== 'maomao' || password !== 'maomaomao')) {
+      setLogonError('ユーザー名かパスワードが間違っています。'); hasError = true;
+    }
+    if (!hasError) {
+      localStorage.setItem('token', 'dummy_key');
+      navigate('/menu');
+    }
   };
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <Title label='家計簿' fontSize='100px' />
+      <Title label='家計簿アプリ' fontSize='100px' />
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '50px', marginBottom: '60px' }}>
         <InputField
           label='ユーザー名'
           placeholder='ユーザー名を入力してください'
-          width='850px'
+          width='1000px'
           fontSize='50px'
           height='70px'
           value={username}
@@ -74,7 +81,7 @@ export const Logon: React.FC = () => {
           label='パスワード'
           placeholder='パスワードを入力してください'
           type='password'
-          width='850px'
+          width='1000px'
           fontSize='50px'
           height='70px'
           value={password}
@@ -84,7 +91,7 @@ export const Logon: React.FC = () => {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '50px', margin: '50px', alignItems: 'center' }}>
-        <Button label='ログオン' fontSize='25px' width='300px' padding='20px' onClick={handleLogon} />
+        <Button label='ログオン' fontSize='25px' width='300px' padding='20px' onClick={handleLogon} errorMessage={logonError} />
         <Link to="/new" style={{ textDecoration: 'none' }}>
           <Button label='新規登録' fontSize='25px' width='300px' padding='20px' />
         </Link>
