@@ -8,6 +8,7 @@ interface InputFieldProps {
   fontSize?: string;
   inputFontSize?: string;
   height?: string;
+  textAlign?: 'left' | 'right' | 'center';
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   errorMessage?: string;
@@ -21,19 +22,22 @@ export const InputField: React.FC<InputFieldProps> = ({
   fontSize = '20px',
   inputFontSize = '20px',
   height = '40px',
+  textAlign = 'left',
   value,
   onChange,
-  errorMessage
+  errorMessage,
 }) => {
   const [isReveal, setIsReveal] = useState(false);
   const inputType = type === 'password' ? (isReveal ? 'text' : 'password') : type;
+
+  const paddingStyle = textAlign === 'right' ? '0 12px 0 12px' : '0 60px 0 12px';
 
   return (
     <div style={{
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'center',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       gap: '10px',
       boxSizing: 'border-box',
       width: width
@@ -44,14 +48,16 @@ export const InputField: React.FC<InputFieldProps> = ({
         flex: 4.5,
         display: 'flex',
         minWidth: 0,
-        width: '100%',
+        width: '250%',
       }}>
         <label style={{
           fontSize: fontSize,
           color: '#000',
           whiteSpace: 'nowrap',
-          textAlign: 'left',
-          flexShrink: 0
+          textAlign: 'justify',
+          textAlignLast: 'justify',
+          flexShrink: 0,
+          width: '100%'
         }}>
           {label}
         </label>
@@ -69,7 +75,7 @@ export const InputField: React.FC<InputFieldProps> = ({
         {/* ： */}
         <span style={{ fontSize: fontSize, color: '#000' }}>：</span>
 
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%', position: 'relative' }}>
           {/* 入力欄本体 */}
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', position: 'relative' }}>
             <input
@@ -84,6 +90,7 @@ export const InputField: React.FC<InputFieldProps> = ({
                 border: '1px solid #000',
                 boxSizing: 'border-box',
                 width: '100%',
+                textAlign: textAlign,
                 minWidth: 0,
                 flexShrink: 0
               }}
@@ -115,7 +122,9 @@ export const InputField: React.FC<InputFieldProps> = ({
               color: 'red',
               fontSize: inputFontSize,
               whiteSpace: 'nowrap',
-              marginTop: '4px',
+              position: 'absolute',
+              top: height,
+              marginTop: '8px',
               textAlign: 'left'
             }}>
               {errorMessage}
