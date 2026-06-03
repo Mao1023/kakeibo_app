@@ -14,7 +14,7 @@ export const LogoutButton: React.FC<LogoutButtonProps> = () => {
     };
 
     return (
-        <div style={{ position: 'fixed', right: '50px', top: '50px' }}>
+        <div style={{ position: 'absolute', right: '50px', top: '50px' }}>
             <Button label='ログオフ' onClick={handleLogout} />
         </div>
     );
