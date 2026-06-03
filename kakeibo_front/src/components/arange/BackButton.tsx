@@ -11,7 +11,7 @@ export const BackButton: React.FC<BackButtonProps> = ({
 }) => {
 
     return (
-        <div style={{ position: 'fixed', left: '50px', bottom: '50px' }}>
+        <div style={{ position: 'absolute', left: '0px', bottom: '50px' }}>
             <Link to={url} style={{ textDecoration: 'none' }}>
                 <Button label='戻る' />
             </Link>

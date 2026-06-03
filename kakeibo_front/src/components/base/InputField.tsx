@@ -30,8 +30,6 @@ export const InputField: React.FC<InputFieldProps> = ({
   const [isReveal, setIsReveal] = useState(false);
   const inputType = type === 'password' ? (isReveal ? 'text' : 'password') : type;
 
-  const paddingStyle = textAlign === 'right' ? '0 12px 0 12px' : '0 60px 0 12px';
-
   return (
     <div style={{
       display: 'flex',

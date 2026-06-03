@@ -7,12 +7,12 @@ interface TitleProps {
 
 export const Title: React.FC<TitleProps> = ({
   label,
-  fontSize = '80px'
+  fontSize = '50px'
 }) => {
   return (
     <h1 style={{
       alignItems: 'center',
-      marginTop: '30px',
+      marginTop: '15px',
       color: '#000',
       textAlign: 'center',
       fontSize: fontSize
