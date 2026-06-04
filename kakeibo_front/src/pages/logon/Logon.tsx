@@ -64,14 +64,14 @@ export const Logon: React.FC = () => {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <Title label='家計簿アプリ' fontSize='100px' />
+      <Title label='家計簿アプリ' fontSize='60px' />
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '50px', marginBottom: '60px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '45px', marginBottom: '60px' }}>
         <InputField
           label='ユーザー名'
           placeholder='ユーザー名を入力してください'
-          width='1000px'
-          fontSize='50px'
+          width='800px'
+          fontSize='25px'
           height='70px'
           value={username}
           onChange={(e) => handleUsernameChange(e.target.value)}
@@ -81,8 +81,8 @@ export const Logon: React.FC = () => {
           label='パスワード'
           placeholder='パスワードを入力してください'
           type='password'
-          width='1000px'
-          fontSize='50px'
+          width='800px'
+          fontSize='25px'
           height='70px'
           value={password}
           onChange={(e) => handlePasswordChange(e.target.value)}
@@ -90,10 +90,10 @@ export const Logon: React.FC = () => {
         />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '50px', margin: '50px', alignItems: 'center' }}>
-        <Button label='ログオン' fontSize='25px' width='300px' padding='20px' onClick={handleLogon} errorMessage={logonError} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', alignItems: 'center' }}>
+        <Button label='ログオン' fontSize='25px' width='250px' height='50px' padding='5px' onClick={handleLogon} errorMessage={logonError} />
         <Link to="/new" style={{ textDecoration: 'none' }}>
-          <Button label='新規登録' fontSize='25px' width='300px' padding='20px' />
+          <Button label='新規登録' fontSize='25px' width='250px' height='50px' padding='5px' />
         </Link>
       </div>
     </div>
