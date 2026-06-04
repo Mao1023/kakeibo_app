@@ -20,6 +20,15 @@ export const isValidNumber = (value: string): boolean => {
     return true; // 両方クリアしたらOK
 };
 
+export const isValidLength = (value: string, min: number, max: number): boolean => {
+    // 1. 桁数チェック
+    if (value.length < min || value.length > max) {
+        return false;
+    }
+
+    return true; // 両方クリアしたらOK
+};
+
 export const isValidInput = (value: string, min: number, max: number): boolean => {
     // 1. 桁数チェック
     if (value.length < min || value.length > max) {

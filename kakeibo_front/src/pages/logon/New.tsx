@@ -89,13 +89,13 @@ export const New = () => {
         <div style={{ textAlign: 'center' }}>
             <Title label='新規登録' />
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '50px', marginBottom: '60px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '50px', marginBottom: '40px' }}>
                 <InputField
                     label='ユーザー名'
                     placeholder='ユーザー名を入力してください'
-                    width='1000px'
-                    fontSize='50px'
-                    height='70px'
+                    width='800px'
+                    fontSize='30px'
+                    height='50px'
                     value={username}
                     onChange={(e) => handleUsernameChange(e.target.value)}
                     errorMessage={usernameError}
@@ -104,9 +104,9 @@ export const New = () => {
                     label='パスワード'
                     placeholder='パスワードを入力してください'
                     type='password'
-                    width='1000px'
-                    fontSize='50px'
-                    height='70px'
+                    width='800px'
+                    fontSize='30px'
+                    height='50px'
                     value={password}
                     onChange={(e) => handlePasswordChange(e.target.value)}
                     errorMessage={passwordError}
@@ -115,9 +115,9 @@ export const New = () => {
                     label='パスワード（確認用）'
                     placeholder='パスワード（確認用）を入力してください'
                     type='password'
-                    width='1000px'
-                    fontSize='50px'
-                    height='70px'
+                    width='800px'
+                    fontSize='30px'
+                    height='50px'
                     value={passwordConfirm}
                     onChange={(e) => handlePasswordConfirmChange(e.target.value)}
                     errorMessage={passwordConfirmError}
@@ -125,7 +125,7 @@ export const New = () => {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '50px', margin: '50px', alignItems: 'center' }}>
-                <Button label='登録' fontSize='25px' width='300px' padding='20px' onClick={handleRegister} />
+                <Button label='登録' fontSize='25px' width='300px' onClick={handleRegister} />
             </div>
             <BackButton url='/logon' />
         </div>

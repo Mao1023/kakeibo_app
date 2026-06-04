@@ -12,7 +12,7 @@ export const Title: React.FC<TitleProps> = ({
   return (
     <h1 style={{
       alignItems: 'center',
-      marginTop: '15px',
+      marginTop: '10px',
       color: '#000',
       textAlign: 'center',
       fontSize: fontSize

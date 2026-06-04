@@ -74,7 +74,7 @@ export const SettingOthers = () => {
             width: '100%',
             alignItems: 'center',
             minHeight: '100vh',
-            paddingBottom: '160px',
+            paddingBottom: '0px',
         }}>
             <Title label='その他設定' />
 
@@ -123,11 +123,12 @@ export const SettingOthers = () => {
                     baseWidth='90px'
                     handleWidth='45px'
                 />
+                <span style={{ display: 'flex', fontSize: '50px', margin: '10px', visibility: 'hidden' }}></span>
             </div>
 
             <BackButton url='/setting' />
 
-            <Button label='登録' fontSize='25px' width='300px' padding='20px' onClick={handleRegister} />
+            <Button label='登録' fontSize='25px' width='300px' onClick={handleRegister} />
 
         </div>
     );
