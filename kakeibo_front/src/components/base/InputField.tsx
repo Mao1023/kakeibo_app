@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 interface InputFieldProps {
-  label?: string;
+  label: string;
   placeholder?: string;
   type?: string;
   width?: string;
