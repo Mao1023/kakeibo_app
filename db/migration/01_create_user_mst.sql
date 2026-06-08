@@ -1,0 +1,7 @@
+CREATE TABLE user_mst (
+    user_id SERIAL PRIMARY KEY,
+    user_name VARCHAR(50) NOT NULL UNIQUE,
+    user_password_hash VARCHAR(255) NOT NULL,
+    user_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    user_added_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
