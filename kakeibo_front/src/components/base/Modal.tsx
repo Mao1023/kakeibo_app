@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "./Button";
 
 interface ModalProps {
     showFlag: boolean;
@@ -7,11 +6,7 @@ interface ModalProps {
     children: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ showFlag, setShowModal, children }) => {
-    const closeModal = () => {
-        setShowModal(false);
-    };
-
+const Modal: React.FC<ModalProps> = ({ showFlag, children }) => {
     if (!showFlag) return null;
 
     return (
@@ -44,12 +39,9 @@ const Modal: React.FC<ModalProps> = ({ showFlag, setShowModal, children }) => {
                             height: '500px',
                         }}>
                         {children}
-                        <Button label="閉じる" onClick={closeModal} />
                     </div>
                 </div>
-            )
-            }
-
+            )}
         </div >
     );
 };

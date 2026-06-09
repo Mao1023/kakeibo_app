@@ -35,7 +35,11 @@ export const Button: React.FC<ButtonProps> = ({
                         backgroundColor: backgroundColor,
                         border: '1px solid #000',
                         borderRadius: '15px',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        alignItems: 'center',
+                        lineHeight: 1,
+                        verticalAlign: 'middle',
                     }}>
                     {label}
                 </button>

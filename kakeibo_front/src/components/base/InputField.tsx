@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 interface InputFieldProps {
   label: string;
   placeholder?: string;
+  unit?: string;
   type?: string;
   width?: string;
   fontSize?: string;
@@ -17,6 +18,7 @@ interface InputFieldProps {
 export const InputField: React.FC<InputFieldProps> = ({
   label,
   placeholder,
+  unit,
   type = 'text',
   width = '450px',
   fontSize = '20px',
@@ -74,6 +76,13 @@ export const InputField: React.FC<InputFieldProps> = ({
         <span style={{ fontSize: fontSize, color: '#000' }}>：</span>
 
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%', position: 'relative' }}>
+          <style>{`
+                input::placeholder {
+                text-align: left !important;
+              }
+            `}
+          </style>
+
           {/* 入力欄本体 */}
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', position: 'relative' }}>
             <input
@@ -84,7 +93,8 @@ export const InputField: React.FC<InputFieldProps> = ({
               style={{
                 fontSize: inputFontSize,
                 height: height,
-                padding: '0 60px 0 12px',
+                padding: '0px 12px',
+                paddingRight: (unit && value) || (type === 'password') ? '40px' : '12px',
                 border: '1px solid #000',
                 boxSizing: 'border-box',
                 width: '100%',
@@ -93,6 +103,30 @@ export const InputField: React.FC<InputFieldProps> = ({
                 flexShrink: 0
               }}
             />
+
+            {(unit && value) && (
+              <span
+                onClick={() => setIsReveal(!isReveal)}
+                role="presentation"
+                style={{
+                  position: 'absolute',
+                  right: '15px',
+                  cursor: 'pointer',
+                  fontSize: inputFontSize,
+                  color: '#666',
+                  zIndex: 10,
+                  display: 'flex',
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  lineHeight: 1,
+                  verticalAlign: 'middle',
+                  height: '100%'
+                }}
+              >
+                {unit}
+              </span>
+
+            )}
 
             {type === 'password' && (
               <span
