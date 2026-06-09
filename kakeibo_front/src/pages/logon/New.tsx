@@ -95,6 +95,7 @@ export const New = () => {
                     placeholder='ユーザー名を入力してください'
                     width='800px'
                     fontSize='30px'
+                    inputFontSize='17px'
                     height='50px'
                     value={username}
                     onChange={(e) => handleUsernameChange(e.target.value)}
@@ -106,6 +107,7 @@ export const New = () => {
                     type='password'
                     width='800px'
                     fontSize='30px'
+                    inputFontSize='17px'
                     height='50px'
                     value={password}
                     onChange={(e) => handlePasswordChange(e.target.value)}
@@ -117,6 +119,7 @@ export const New = () => {
                     type='password'
                     width='800px'
                     fontSize='30px'
+                    inputFontSize='17px'
                     height='50px'
                     value={passwordConfirm}
                     onChange={(e) => handlePasswordConfirmChange(e.target.value)}

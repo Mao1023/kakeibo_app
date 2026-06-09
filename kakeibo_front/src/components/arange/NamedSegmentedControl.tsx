@@ -1,25 +1,30 @@
 import React, { useState } from 'react';
-import { SelectBox } from '../base/SelectBox';
+import { SegmentedControl } from '../base/SegmentControl';
 
-interface NamedSelectBoxProps {
+interface NamedSegmentedControlProps {
     label: string;
+    label1: string;
+    label2: string;
     width?: string;
     fontSize?: string;
     inputFontSize?: string;
     height?: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    value: 1 | 2;
+    onChange: (value: 1 | 2) => void;
 }
 
-export const NamedSelectBox: React.FC<NamedSelectBoxProps> = ({
+export const NamedSegmentedControl: React.FC<NamedSegmentedControlProps> = ({
     label,
+    label1,
+    label2,
     width = '450px',
     fontSize = '20px',
     inputFontSize = '20px',
     height = '40px',
-}) => {
+    value,
+    onChange,
 
-    const [itemId, setItemId] = useState<string>('');
+}) => {
 
     return (
         <div style={{
@@ -65,11 +70,13 @@ export const NamedSelectBox: React.FC<NamedSelectBoxProps> = ({
                 <span style={{ fontSize: fontSize, color: '#000' }}>：</span>
 
                 <div style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%', position: 'relative' }}>
-                    <SelectBox
+                    <SegmentedControl
+                        label1={label1}
+                        label2={label2}
                         height={height}
-                        value={itemId}
-                        onChange={(e) => setItemId(e.target.value)}
-                        inputFontSize={inputFontSize}
+                        FontSize={inputFontSize}
+                        value={value}
+                        onChange={onChange}
                     />
                 </div>
             </div>

@@ -5,6 +5,7 @@ import { BackButton } from '../../components/arange/BackButton';
 import { DataTable } from '../../components/base/DataTable';
 import { Button } from '../../components/base/Button';
 import { isValidLength, isValidNumber } from '../../utils/Validation';
+import { SegmentedControl } from '../../components/base/SegmentControl';
 
 interface AccountItem {
     id: number;
@@ -115,6 +116,7 @@ export const SettingItems = () => {
             setItemError('50桁以内で入力してください。');
             hasError = true;
         }
+
         if (inputCategory === 2) {
             if (!inputKotei.trim()) {
                 setKoteiError('固定費を入力してください');
@@ -151,8 +153,12 @@ export const SettingItems = () => {
     const columns = [
         { header: '番号', width: '60px', render: (_: any, idx: number) => idx + 1 },
         { header: '項目名', width: '150px', render: (item: AccountItem) => item.name },
-        { header: '分類', width: '100px', render: (item: AccountItem) => item.category },
-        { header: '固定費金額', width: '120px', render: (item: AccountItem) => item.amount !== undefined ? item.amount : 'ー' },
+        {
+            header: '分類',
+            width: '100px',
+            render: (item: AccountItem) => item.category === 1 ? '支出' : '固定費'
+        },
+        { header: '固定費金額', width: '120px', render: (item: AccountItem) => item.amount !== undefined ? item.amount.toLocaleString() : 'ー' },
         {
             header: '',
             width: '100px',
@@ -238,23 +244,11 @@ export const SettingItems = () => {
                     <div style={{ marginBottom: '40px' }}>
                         <label style={{ display: 'block', fontSize: '18px', marginBottom: '12px' }}>分類</label>
                         <div style={{ display: 'flex', gap: '15px' }}>
-                            <Button
-                                label={'支出'}
-                                fontSize='16px'
-                                width='90px'
-                                height='40px'
-                                padding='5px'
-                                onClick={() => setInputCategory(1)}
-                                backgroundColor={inputCategory === 1 ? '#ccc' : '#fff'}
-                            />
-                            <Button
-                                label={'固定費'}
-                                fontSize='16px'
-                                width='90px'
-                                height='40px'
-                                padding='5px'
-                                onClick={() => setInputCategory(2)}
-                                backgroundColor={inputCategory === 2 ? '#ccc' : '#fff'}
+                            <SegmentedControl
+                                label1='支出'
+                                label2='固定費'
+                                value={inputCategory}
+                                onChange={(val) => setInputCategory(val)}
                             />
                         </div>
                     </div>
