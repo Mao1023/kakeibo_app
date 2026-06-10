@@ -56,8 +56,9 @@ export const Kakeibo = () => {
         <div style={{
             position: 'relative',
             width: '100%',
-            minHeight: '200vh',
             boxSizing: 'border-box',
+            alignItems: 'stretch',
+            minHeight: '200vh',
         }}>
             {/* 上部ヘッダーエリア */}
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '30px' }}>
@@ -92,11 +93,11 @@ export const Kakeibo = () => {
 
                 {/* 右カラム：マトリクス表の配置予定地（次回以降作成） */}
                 <div style={{
-                    flex: 1,
-                    minHeight: '500px',
                     display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    flexGrow: 1,
+                    minWidth: 0,         // 💡 これが超重要。子要素のはみ出しを防ぐ
+                    overflowX: 'auto',
+                    minHeight: 'inherit'
                 }}>
                     <KakeiboMatrixTable />
                 </div>
