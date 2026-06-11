@@ -15,7 +15,7 @@ interface AccountItem {
 }
 
 export const SettingItems = () => {
-    // 💡 2. モックデータを画面内で定義（APIとDB整ったら修正）
+    // モックデータを画面内で定義（APIとDB整ったら修正）
     const [itemsMockData, setItemsMockData] = useState<AccountItem[]>([
         { id: 1, name: '1', category: 1 },
         { id: 2, name: '2', category: 1 },
@@ -29,7 +29,7 @@ export const SettingItems = () => {
         { id: 10, name: '10', category: 1 },
     ]);
 
-    // 💡 右側の入力フォーム用ステート
+    // 右側の入力フォーム用ステート
     const [inputName, setInputName] = useState(() => {
         return localStorage.getItem('name') || '';
     });
@@ -40,14 +40,14 @@ export const SettingItems = () => {
     const [itemError, setItemError] = useState('');
     const [koteiError, setKoteiError] = useState('');
 
-    // 💡 編集ボタンクリック
+    // 編集ボタンクリック
     const [isEdit, setIsEdit] = useState(false);
-    const [editingId, setEditingId] = useState<number | null>(null); // 💡 現在編集している項目のID
+    const [editingId, setEditingId] = useState<number | null>(null); // 現在編集している項目のID
 
-    // 💡 3. ボタン用関数を定義
+    // ボタン用関数を定義
     const handleEdit = (item: AccountItem) => {
         setIsEdit(true);
-        setEditingId(item.id);      // どのIDを編集しているか記憶
+        setEditingId(item.id);
         setInputName(item.name);
         setInputKotei(item.amount !== undefined ? String(item.amount) : '0');
         setInputCategory(item.category);
@@ -98,7 +98,7 @@ export const SettingItems = () => {
     const handleDelete = (item: AccountItem) => {
         if (window.confirm(`${item.name}を削除しますか？`)) {
             setItemsMockData(itemsMockData.filter(i => i.id !== item.id));
-            // もし編集中のアイテムを消した場合はフォームもリセット
+
             if (editingId === item.id) resetForm();
         }
     };
@@ -149,7 +149,7 @@ export const SettingItems = () => {
         setKoteiError('');
     };
 
-    // 💡 テーブルの列定義（型の指定を追加してエラーを解消）
+    // テーブルの列定義（型の指定を追加してエラーを解消）
     const columns = [
         { header: '番号', width: '60px', render: (_: any, idx: number) => idx + 1 },
         { header: '項目名', width: '150px', render: (item: AccountItem) => item.name },
@@ -164,7 +164,6 @@ export const SettingItems = () => {
             width: '100px',
             render: (item: AccountItem) => (
                 <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
-                    {/* 絵文字ボタンに最低限のスタイル調整 */}
                     <button
                         onClick={() => handleEdit(item)}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
@@ -190,11 +189,9 @@ export const SettingItems = () => {
             boxSizing: 'border-box',
             padding: '20px 40px'
         }}>
-            {/* ヘッダー周り */}
             <Title label='項目設定' />
             <LogoutButton />
 
-            {/* 💡 左右2カラム配置（デザイン画像への完全最適化） */}
             <div style={{
                 display: 'flex',
                 flexDirection: 'row',
@@ -297,7 +294,6 @@ export const SettingItems = () => {
                 </div>
             </div>
 
-            {/* 左下の戻るボタン */}
             <div style={{ paddingBottom: '100px' }}>
                 <BackButton url='/setting' />
             </div>

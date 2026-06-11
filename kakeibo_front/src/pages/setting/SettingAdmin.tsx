@@ -14,7 +14,7 @@ interface AccountAdmin {
 }
 
 export const SettingAdmin = () => {
-    // 💡 2. モックデータを画面内で定義（APIとDB整ったら修正）
+    // モックデータを画面内で定義（APIとDB整ったら修正）
     const [adminsMockData, setAdminsMockData] = useState<AccountAdmin[]>([
         { id: 1, name: 'aaaaa', admin: true },
         { id: 2, name: 'bbb', admin: false },
@@ -27,26 +27,22 @@ export const SettingAdmin = () => {
         { id: 9, name: 'maomao', admin: true, isCurrentUser: true }
     ]);
 
-    // 💡 右側の入力フォーム用ステート
     const [inputName, setInputName] = useState(() => {
         return localStorage.getItem('name') || '';
     });
     const [inputAdmin, setInputAdmin] = useState<boolean>(false);
 
-    // 💡 編集ボタンクリック
     const [isEdit, setIsEdit] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null); // 💡 現在編集している項目のID
 
-    // 💡 3. ボタン用関数を定義
     const handleEdit = (admin: AccountAdmin) => {
         setIsEdit(true);
-        setEditingId(admin.id);      // どのIDを編集しているか記憶
+        setEditingId(admin.id);
         setInputName(admin.name);
         setInputAdmin(admin.admin);
     };
 
     const handleUpdate = () => {
-        // 配列の中身をループ処理し、対象のIDだけ新しい入力内容に差し替える
         const updatedList = adminsMockData.map(admin => {
             if (admin.id === editingId) {
                 return {
@@ -58,13 +54,13 @@ export const SettingAdmin = () => {
         });
 
         setAdminsMockData(updatedList);
-        resetForm(); // フォームをクリアして登録モードに戻す
+        resetForm();
     };
 
     const handleDelete = (admin: AccountAdmin) => {
         if (window.confirm(`${admin.name}を削除しますか？`)) {
             setAdminsMockData(adminsMockData.filter(i => i.id !== admin.id));
-            // もし編集中のアイテムを消した場合はフォームもリセット
+
             if (editingId === admin.id) resetForm();
         }
     };
@@ -91,13 +87,13 @@ export const SettingAdmin = () => {
                         {/* 編集ボタン */}
                         <button
                             onClick={() => handleEdit(admin)}
-                            disabled={isSelf} // 自分なら無効化
+                            disabled={isSelf}
                             style={{
                                 background: 'none',
                                 border: 'none',
                                 cursor: isSelf ? 'not-allowed' : 'pointer',
                                 padding: 0,
-                                opacity: isSelf ? 0.3 : 1 // 自分なら薄く表示
+                                opacity: isSelf ? 0.3 : 1
                             }}
                         >
                             <i className="fas fa-cog" style={{ fontSize: '18px', color: '#000' }} />
@@ -106,13 +102,13 @@ export const SettingAdmin = () => {
                         {/* 削除ボタン */}
                         <button
                             onClick={() => handleDelete(admin)}
-                            disabled={isSelf} // 自分なら無効化
+                            disabled={isSelf}
                             style={{
                                 background: 'none',
                                 border: 'none',
                                 cursor: isSelf ? 'not-allowed' : 'pointer',
                                 padding: 0,
-                                opacity: isSelf ? 0.3 : 1 // 自分なら薄く表示
+                                opacity: isSelf ? 0.3 : 1
                             }}
                         >
                             <i className="fas fa-times" style={{ fontSize: '18px', color: '#000' }} />
@@ -135,7 +131,7 @@ export const SettingAdmin = () => {
             <Title label='管理者設定' />
             <LogoutButton />
 
-            {/* 💡 左右2カラム配置（デザイン画像への完全最適化） */}
+            {/* 左右2カラム配置（デザイン画像への完全最適化） */}
             <div style={{
                 display: 'flex',
                 flexDirection: 'row',
@@ -178,8 +174,8 @@ export const SettingAdmin = () => {
                                 <ToggleButton
                                     label="管理者権限"
                                     fontSize="20px"
-                                    checked={inputAdmin} // 💡 選択中のステートと連動
-                                    onChange={(checked) => setInputAdmin(checked)} // 💡 トグル操作でステート変更
+                                    checked={inputAdmin}
+                                    onChange={(checked) => setInputAdmin(checked)}
                                     width='200px'
                                     baseWidth='40px'
                                     handleWidth='20px'
@@ -209,7 +205,6 @@ export const SettingAdmin = () => {
                 </div>
             </div>
 
-            {/* 左下の戻るボタン */}
             <div style={{ paddingBottom: '100px' }}>
                 <BackButton url='/setting' />
             </div>

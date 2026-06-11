@@ -20,7 +20,7 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route path="/menu" element={<Menu />} />
-            <Route path="/kakeibo" element={<Kakeibo />} />
+            <Route path="/kakeibo/:year/:month" element={<Kakeibo />} />
             <Route path="/setting" element={<Setting />} />
             <Route path="/setting/items" element={<SettingItems />} />
             <Route path="/setting/others" element={<SettingOthers />} />

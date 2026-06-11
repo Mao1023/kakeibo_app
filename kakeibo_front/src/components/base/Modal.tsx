@@ -13,7 +13,7 @@ const Modal: React.FC<ModalProps> = ({ showFlag, children }) => {
         <div style={{
             textAlign: 'center',
         }}>
-            {showFlag && ( // showFlagがtrueだったらModalを表示する
+            {showFlag && (
                 <div
                     id="overlay"
                     style={{

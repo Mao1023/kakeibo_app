@@ -7,15 +7,24 @@ import DatePicker from 'react-datepicker';
 import { isValidLength, isValidNumber } from '../utils/Validation';
 import { Button } from '../components/base/Button';
 import { NamedSegmentedControl } from '../components/arange/NamedSegmentedControl';
+import { toHalfWidth } from '../utils/StringUtil';
+
+interface ExpenseLog {
+    day: number;
+    category: string;
+    amount: number;
+    name?: string;
+}
 
 interface ShisyutsuModalProps {
     showFlag: boolean;
     setShowModal: (flag: boolean) => void;
+    onAddExpense: (expense: ExpenseLog) => void;
 }
 
-export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setShowModal }) => {
+export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setShowModal, onAddExpense }) => {
     const [startDate, setStartDate] = useState<Date | null>(new Date());
-    const [itemCategory, setItemCategory] = useState('');
+    const [itemCategory, setItemCategory] = useState('1');
     const [shisyutsuType, setShisyutsuType] = useState<1 | 2>(2);
     const [shisyutsuName, setShisyutsuName] = useState('');
     const [shisyutsuAmount, setShisyutsuAmount] = useState('');
@@ -40,10 +49,18 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
     ));
     CustomInput.displayName = 'CustomInput';
 
-    // 💡 リアルタイムの入力値チェック（引数 val から判定する形に統一）
+    const resetForm = () => {
+        setStartDate(new Date());
+        setItemCategory('1');
+        setShisyutsuType(2);
+        setShisyutsuName('');
+        setShisyutsuAmount('');
+        setShisyutsuNameError('');
+        setShisyutsuAmountError('');
+    };
+
     const handleShisyutsuNameChange = (val: string) => {
         setShisyutsuName(val);
-
         if (!val.trim()) {
             setShisyutsuNameError('支出名を入力してください。');
         } else if (!isValidLength(val, 1, 255)) {
@@ -53,13 +70,34 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
         }
     };
 
-    const handleStartAmountChange = (val: string) => {
-        setShisyutsuAmount(val);
+    // 💡 文字列からカンマや不要な日本語ノイズを完全に除去してクリーンな文字列にする安全ガード
+    const cleanNumberString = (value: string): string => {
+        const halfWidth = toHalfWidth(value);
+        // カンマ、および数値以外の文字（日本語・英字など）をすべて抹消
+        return halfWidth.replace(/,/g, '').replace(/[^0-9]/g, '');
+    };
 
-        if (!val.trim()) {
+    const handleStartAmountChange = (val: string) => {
+        const cleaned = cleanNumberString(val);
+
+        // 💡 カンマ付きで画面に見せるために3桁区切りの文字列に変換して保持
+        const formatted = cleaned === '' ? '' : Number(cleaned).toLocaleString();
+        setShisyutsuAmount(formatted);
+
+        if (!cleaned.trim()) {
             setShisyutsuAmountError('支出額を入力してください。');
-        } else if (!isValidNumber(val)) {
-            setShisyutsuAmountError('半角数字で入力してください。');
+        } else {
+            setShisyutsuAmountError(''); // 💡 不要文字は最初から弾かれるため、常時エラーなし
+        }
+    };
+
+    const execHalfWidthConversion = (currentVal: string) => {
+        const cleaned = cleanNumberString(currentVal);
+        const formatted = cleaned === '' ? '' : Number(cleaned).toLocaleString();
+        setShisyutsuAmount(formatted);
+
+        if (!cleaned.trim()) {
+            setShisyutsuAmountError('支出額を入力してください。');
         } else {
             setShisyutsuAmountError('');
         }
@@ -79,36 +117,45 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
             hasError = true;
         }
 
-        if (!shisyutsuAmount.trim()) {
+        // 💡 登録用にカンマを完全に抜いた純粋な数字文字列を取得
+        const rawAmount = shisyutsuAmount.replace(/,/g, '');
+
+        if (!rawAmount.trim()) {
             setShisyutsuAmountError('支出額を入力してください。');
             hasError = true;
-        } else if (!isValidNumber(shisyutsuAmount)) {
+        } else if (!isValidNumber(rawAmount)) {
             setShisyutsuAmountError('半角数字で入力してください。');
             hasError = true;
         }
 
         if (hasError) return;
 
-        console.log('登録データ:', {
-            date: startDate,
-            category: itemCategory,
-            type: shisyutsuType,
-            name: shisyutsuName,
-            amount: Number(shisyutsuAmount)
-        });
+        const selectedDay = startDate ? startDate.getDate() : new Date().getDate();
 
+        const categoryMapping: { [key: string]: string } = {
+            '1': '食費',
+            '2': '日用品',
+            '3': '交際費',
+            '4': '交通費',
+            '5': '衣服・美容',
+            '6': '趣味・娯楽',
+            '7': 'その他'
+        };
+
+        const finalCategory = shisyutsuType === 1
+            ? '収入'
+            : (categoryMapping[itemCategory] || 'other');
+
+        const newExpense: ExpenseLog = {
+            day: selectedDay,
+            category: finalCategory,
+            name: shisyutsuName,
+            amount: Number(rawAmount) // 💡 カンマなしの安全な数値を格納
+        };
+
+        onAddExpense(newExpense);
         resetForm();
         setShowModal(false);
-    };
-
-    const resetForm = () => {
-        setStartDate(new Date());
-        setItemCategory('');
-        setShisyutsuType(2);
-        setShisyutsuName('');
-        setShisyutsuAmount('');
-        setShisyutsuNameError('');
-        setShisyutsuAmountError('');
     };
 
     return (
@@ -130,12 +177,14 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
                         popperPlacement="bottom-end"
                     />
                 </div>
-                <NamedSelectBox
-                    label='項目名'
-                    height='35px'
-                    value={itemCategory}
-                    onChange={(e) => setItemCategory(e.target.value)}
-                />
+                {shisyutsuType === 2 && (
+                    <NamedSelectBox
+                        label='項目名'
+                        height='35px'
+                        value={itemCategory}
+                        onChange={(e) => setItemCategory(e.target.value)}
+                    />
+                )}
                 <NamedSegmentedControl
                     label='支出分類'
                     label1='収入'
@@ -157,9 +206,11 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
                     unit='円'
                     textAlign='right'
                     inputFontSize='15px'
-                    value={shisyutsuAmount}
+                    value={isNaN(Number(shisyutsuAmount)) ? '0' : (Number(shisyutsuAmount) === 0 ? '0' : shisyutsuAmount.toLocaleString())}
                     onChange={(e) => handleStartAmountChange(e.target.value)}
                     errorMessage={shisyutsuAmountError}
+                    onBlur={(e) => execHalfWidthConversion(e.target.value)}
+                    onCompositionEnd={(e) => execHalfWidthConversion(e.currentTarget.value)}
                 />
 
                 <div style={{

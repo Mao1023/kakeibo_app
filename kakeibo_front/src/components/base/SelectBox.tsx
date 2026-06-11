@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-// 項目マスタの型定義
 interface Item {
     itemId: number;
     itemName: string;
@@ -28,6 +27,10 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
             { itemId: 1, itemName: '食品' },
             { itemId: 2, itemName: '日用品' },
             { itemId: 3, itemName: '交際費' },
+            { itemId: 4, itemName: '交通費' },
+            { itemId: 5, itemName: '衣類・美容' },
+            { itemId: 6, itemName: '趣味・娯楽' },
+            { itemId: 7, itemName: 'その他' },
         ];
         setItems(mockItems);
     }, []);

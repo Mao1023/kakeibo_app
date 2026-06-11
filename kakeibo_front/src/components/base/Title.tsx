@@ -1,8 +1,8 @@
 import React from "react";
 
 interface TitleProps {
-  label: string;          // 文字
-  fontSize?: string;      // 文字の大きさ
+  label: string;
+  fontSize?: string;
 }
 
 export const Title: React.FC<TitleProps> = ({

@@ -131,44 +131,6 @@ export const SettingOthers = () => {
                 />
 
             </div>
-            {/* <InputField
-                label='月の開始日'
-                placeholder='月の開始日を入力してください'
-                unit='日'
-                width='700px'
-                fontSize='20px'
-                inputFontSize='20px'
-                height='50px'
-                textAlign='right'
-                value={startDate}
-                onChange={(e) => handleStartDateChange(e.target.value)}
-                errorMessage={startDateError}
-            />
-
-            <InputField
-                label='月の開始額'
-                placeholder='月の開始額を入力してください'
-                unit='円'
-                width='700px'
-                fontSize='20px'
-                inputFontSize='20px'
-                height='50px'
-                textAlign='right'
-                value={startAmount}
-                onChange={(e) => handleStartAmountChange(e.target.value)}
-                errorMessage={startAmountError}
-            />
-
-            <ToggleButton
-                label="先月分の繰り越し"
-                fontSize="20px"
-                checked={isCarryOverOn}
-                onChange={handleToggleChange}
-                width='700px'
-                baseWidth='90px'
-                handleWidth='45px'
-            /> */}
-
             <BackButton url='/setting' />
 
             <Button label='登録' fontSize='25px' width='300px' onClick={handleRegister} />
