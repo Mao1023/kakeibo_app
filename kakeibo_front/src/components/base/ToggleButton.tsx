@@ -19,28 +19,27 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
     baseWidth = '70px',
     handleWidth = '35px'
 }) => {
-    // 💡 土台（背景）のスタイル
     const switchStyle: React.CSSProperties = {
         position: 'relative',
         display: 'inline-block',
         width: baseWidth,
         height: handleWidth,
-        backgroundColor: checked ? '#4cd964' : '#ccc', // ONなら緑、OFFならグレー
+        backgroundColor: checked ? '#4cd964' : '#ccc',
         borderRadius: '100px',
         cursor: 'pointer',
-        transition: 'background-color 0.3s', // 色が変わるときのアニメーション
+        transition: 'background-color 0.3s',
     };
 
     // 💡 中の丸いツマミのスタイル
     const dialStyle: React.CSSProperties = {
         position: 'absolute',
         top: '1px',
-        left: checked ? handleWidth : '0px', // ONなら右側、OFFなら左側にワープ
+        left: checked ? handleWidth : '0px',
         width: handleWidth,
         height: handleWidth,
         backgroundColor: '#fff',
         borderRadius: '50%',
-        transition: 'left 0.3s', // 丸がスライドするアニメーション
+        transition: 'left 0.3s',
         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
     };
 
@@ -90,7 +89,7 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
                 {/* トグルボタン本体 */}
                 <div
                     style={switchStyle}
-                    onClick={() => onChange(!checked)} // クリックされたら状態を反転させる
+                    onClick={() => onChange(!checked)}
                 >
                     <div style={dialStyle} />
                 </div>

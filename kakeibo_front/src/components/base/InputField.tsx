@@ -11,8 +11,11 @@ interface InputFieldProps {
   height?: string;
   textAlign?: 'left' | 'right' | 'center';
   value: string;
+  autoComplete?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   errorMessage?: string;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onCompositionEnd?: (e: React.CompositionEvent<HTMLInputElement>) => void;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -26,8 +29,11 @@ export const InputField: React.FC<InputFieldProps> = ({
   height = '40px',
   textAlign = 'left',
   value,
+  autoComplete,
   onChange,
   errorMessage,
+  onBlur,
+  onCompositionEnd
 }) => {
   const [isReveal, setIsReveal] = useState(false);
   const inputType = type === 'password' ? (isReveal ? 'text' : 'password') : type;
@@ -89,7 +95,10 @@ export const InputField: React.FC<InputFieldProps> = ({
               type={inputType}
               placeholder={placeholder}
               value={value}
+              autoComplete={autoComplete}
               onChange={onChange}
+              onBlur={onBlur}
+              onCompositionEnd={onCompositionEnd}
               style={{
                 fontSize: inputFontSize,
                 height: height,

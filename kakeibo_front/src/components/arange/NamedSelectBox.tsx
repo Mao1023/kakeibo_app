@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { SelectBox } from '../base/SelectBox';
 
 interface NamedSelectBoxProps {
@@ -17,10 +17,9 @@ export const NamedSelectBox: React.FC<NamedSelectBoxProps> = ({
     fontSize = '20px',
     inputFontSize = '20px',
     height = '40px',
+    value,
+    onChange,
 }) => {
-
-    const [itemId, setItemId] = useState<string>('');
-
     return (
         <div style={{
             display: 'flex',
@@ -67,8 +66,8 @@ export const NamedSelectBox: React.FC<NamedSelectBoxProps> = ({
                 <div style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%', position: 'relative' }}>
                     <SelectBox
                         height={height}
-                        value={itemId}
-                        onChange={(e) => setItemId(e.target.value)}
+                        value={value}
+                        onChange={onChange}
                         inputFontSize={inputFontSize}
                     />
                 </div>

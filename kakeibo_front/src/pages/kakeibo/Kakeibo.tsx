@@ -3,18 +3,22 @@ import { Title } from '../../components/base/Title';
 import { LogoutButton } from '../../components/arange/LogoutButton';
 import { BackButton } from '../../components/arange/BackButton';
 import { ShisyutsuModal } from '../../modals/ShisyutsuModal';
-// 💡 作成した KakeiboSummary をインポート
 import { KakeiboSummary } from '../../components/kakeibo/KakeiboSummary';
 import { KakeiboMatrixTable } from '../../components/kakeibo/KakeiboMatrixTable';
+
+interface ExpenseLog {
+    day: number;
+    category: string;
+    amount: number;
+}
 
 export const Kakeibo = () => {
     const [showModal, setShowModal] = useState(false);
 
-    // 💡 画面で管理する各ステート（初期値は仕様書・デザインに準拠）
-    const [monthLabel] = useState('2026年5月分'); // 表示月
     const [carryOver] = useState(2000);           // 4月分繰越
     const [initialAmount, setInitialAmount] = useState(200000); // 5月分開始額
     const [livingExpenseResidual, setLivingExpenseResidual] = useState(0); // 生活費残高
+    const [expenses, setExpenses] = useState<ExpenseLog[]>([]);
 
     // 固定費のモックデータ
     const [fixedCosts, setFixedCosts] = useState([
@@ -45,7 +49,6 @@ export const Kakeibo = () => {
     };
 
     // 💡 自動計算ボタンのロジック
-    // 繰越金 + 今月分開始額 - 固定費合計 を計算して生活費残高にセットする
     const handleAutoCalculate = () => {
         const totalFixedCost = fixedCosts.reduce((sum, item) => sum + item.amount, 0);
         const calculatedResidual = (carryOver + initialAmount) - totalFixedCost;
@@ -66,12 +69,11 @@ export const Kakeibo = () => {
                 <LogoutButton />
             </div>
 
-            {/* 💡 メインコンテンツエリア：左右2カラムのFlexボックスレイアウト */}
             <div style={{
                 display: 'flex',
                 justifyContent: 'flex-start',
                 alignItems: 'flex-start',
-                gap: '40px', // 左カラムと右カラムの間の余白
+                gap: '40px',
                 width: '100%',
                 minWidth: 0,
                 margin: '30px',
@@ -79,7 +81,6 @@ export const Kakeibo = () => {
             }}>
                 {/* 左カラム：サマリーエリア */}
                 <KakeiboSummary
-                    monthLabel={monthLabel}
                     carryOver={carryOver}
                     initialAmount={initialAmount}
                     setInitialAmount={setInitialAmount}
@@ -95,11 +96,14 @@ export const Kakeibo = () => {
                 <div style={{
                     display: 'flex',
                     flexGrow: 1,
-                    minWidth: 0,         // 💡 これが超重要。子要素のはみ出しを防ぐ
+                    minWidth: 0,
                     overflowX: 'auto',
                     minHeight: 'inherit'
                 }}>
-                    <KakeiboMatrixTable />
+                    <KakeiboMatrixTable
+                        expenses={expenses}
+                        livingExpenseResidual={livingExpenseResidual}
+                    />
                 </div>
             </div>
 
@@ -107,7 +111,11 @@ export const Kakeibo = () => {
             <BackButton url='/menu' />
 
             {/* 支出入力モーダル */}
-            <ShisyutsuModal showFlag={showModal} setShowModal={setShowModal} />
+            <ShisyutsuModal
+                showFlag={showModal}
+                setShowModal={setShowModal}
+                onAddExpense={(newExpense) => setExpenses([...expenses, newExpense])}
+            />
         </div>
     );
 };

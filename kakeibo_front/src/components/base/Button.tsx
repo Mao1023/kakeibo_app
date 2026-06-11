@@ -16,7 +16,7 @@ export const Button: React.FC<ButtonProps> = ({
     fontSize = '20px',
     width = '150px',
     height = '70px',
-    padding = '10px',
+    padding = '0px',
     backgroundColor = '#fff',
     onClick,
     errorMessage

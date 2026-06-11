@@ -1,10 +1,11 @@
 import React from 'react';
 import { Button } from '../base/Button';
 import { InputField } from '../base/InputField';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toHalfWidth } from '../../utils/StringUtil';
+import { isValidNumber } from '../../utils/Validation';
 
-// 親（Kakeibo.tsx）から受け取るデータの型定義
 interface KakeiboSummaryProps {
-    monthLabel: string;          // 例: "2026年5月分"
     carryOver: number;           // 繰越金
     initialAmount: number;       // 今月分開始額
     setInitialAmount: (val: number) => void;
@@ -17,7 +18,6 @@ interface KakeiboSummaryProps {
 }
 
 export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
-    monthLabel,
     carryOver,
     initialAmount,
     setInitialAmount,
@@ -28,15 +28,55 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
     onAutoCalculate,
     onOpenModal,
 }) => {
+    const { year, month } = useParams<{ year: string; month: string }>();
+    const navigate = useNavigate();
+    const currentYear = year ? parseInt(year) : new Date().getFullYear();
+    const currentMonth = month ? parseInt(month) : new Date().getMonth() + 1;
+
     // 固定費の合計値を計算
     const totalFixedCost = fixedCosts.reduce((sum, item) => sum + item.amount, 0);
     // 総合計（繰越 + 今月分）
     const totalBudget = carryOver + initialAmount;
 
-    // 入力文字列を数値に安全に変換するヘルパー関数
+    const prevMonthNumber = currentMonth - 1 === 0 ? 12 : currentMonth - 1;
+
+    const handlecurrentMonth = () => {
+        const today = new Date();
+        const thisYear = today.getFullYear();
+        const thisMonth = String(today.getMonth() + 1).padStart(2, '0');
+        navigate(`/kakeibo/${thisYear}/${thisMonth}`);
+    };
+
+    const handlePrevMonth = () => {
+        let newYear = currentYear;
+        let newMonth = currentMonth - 1;
+        if (newMonth < 1) {
+            newMonth = 12;
+            newYear -= 1;
+        }
+        navigate(`/kakeibo/${newYear}/${String(newMonth).padStart(2, '0')}`);
+    };
+
+    const handleNextMonth = () => {
+        let newYear = currentYear;
+        let newMonth = currentMonth + 1;
+        if (newMonth > 12) {
+            newMonth = 1;
+            newYear += 1;
+        }
+        navigate(`/kakeibo/${newYear}/${String(newMonth).padStart(2, '0')}`);
+    };
+
+    // 💡 カンマと数字以外の不要な文字列（日本語など）を完全に排除して数値化する安全ガード
     const parseNumber = (value: string): number => {
-        const cleanValue = value.replace(/,/g, ''); // カンマを除去
-        return cleanValue === '' ? 0 : Number(cleanValue);
+        // 1. 全角を半角に変換
+        const halfWidth = toHalfWidth(value);
+        // 2. カンマ、および数値・マイナス記号以外の文字（全角・半角英数・日本語）をすべて消去
+        const cleanValue = halfWidth.replace(/,/g, '').replace(/[^0-9-]/g, '');
+
+        if (cleanValue === '' || cleanValue === '-') return 0;
+        const num = Number(cleanValue);
+        return isNaN(num) ? 0 : num; // 💡 万が一 NaN になったら 0 で安全にフォールバック
     };
 
     const handleAmountChange = (index: number, value: string) => {
@@ -46,7 +86,13 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
             }
             return item;
         });
-        setFixedCosts(updatedCosts); // 親のStateを更新（自動的に再計算が走る）
+        setFixedCosts(updatedCosts);
+    };
+
+    // 💡 特殊入力イベント用のハンドラーも安全にパースを適用
+    const execSafeNumberConversion = (currentVal: string) => {
+        const parsed = parseNumber(currentVal);
+        setLivingExpenseResidual(parsed);
     };
 
     return (
@@ -56,10 +102,32 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
             textAlign: 'left',
             fontFamily: 'sans-serif'
         }}>
+            <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'left',
+                marginBottom: '10px'
+            }}>
+                <Button label='今月' width='50px' height='30px' onClick={handlecurrentMonth} />
+            </div>
+
             {/* 月表示 */}
-            <h3 style={{ fontSize: '20px', textDecoration: 'underline', margin: '0 0 25px 0', fontWeight: 'bold' }}>
-                {monthLabel}
-            </h3>
+            <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+                marginBottom: '25px'
+            }}>
+                <Button label='<<' width='50px' height='30px' onClick={handlePrevMonth} />
+
+                <h3 style={{ fontSize: '20px', textDecoration: 'underline', margin: '0', fontWeight: 'bold', flexDirection: 'row' }}>
+                    {currentYear}年{currentMonth}月分
+                </h3>
+
+                <Button label='>>' width='50px' height='30px' onClick={handleNextMonth} />
+            </div>
 
             {/* 上段：金額集計エリア */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '15px' }}>
@@ -86,7 +154,7 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
                             flexShrink: 0,
                             width: '100%'
                         }}>
-                            4月分繰越
+                            {prevMonthNumber}月分繰越
                         </label>
                     </div>
 
@@ -118,15 +186,15 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '300px' }}>
-                    {/* 【修正】5月分の入力は initialAmount を更新する */}
                     <InputField
-                        label='5月分'
+                        label={`${currentMonth}月分`}
                         unit='円'
                         height='30px'
                         textAlign='right'
                         fontSize='16px'
                         inputFontSize='16px'
-                        value={initialAmount === 0 ? '0' : String(initialAmount)}
+                        // 💡 表示が NaN の場合は '0' に退避
+                        value={isNaN(initialAmount) ? '0' : (initialAmount === 0 ? '0' : initialAmount.toLocaleString())}
                         onChange={(e) => setInitialAmount(parseNumber(e.target.value))}
                     />
                 </div>
@@ -136,7 +204,7 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
 
             {/* 総合計 */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '16px', marginBottom: '30px' }}>
-                <span>{totalBudget.toLocaleString()} 円</span>
+                <span>{isNaN(totalBudget) ? 0 : totalBudget.toLocaleString()} 円</span>
             </div>
 
             {/* 中段：固定費一覧テーブル */}
@@ -163,7 +231,7 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
                             <td style={{ border: '1px solid #000', padding: '0' }}>
                                 <input
                                     type="text"
-                                    value={item.amount === 0 ? 0 : item.amount.toLocaleString()}
+                                    value={isNaN(item.amount) ? '0' : (item.amount === 0 ? '0' : item.amount.toLocaleString())}
                                     onChange={(e) => handleAmountChange(idx, e.target.value)}
                                     style={{
                                         width: '100%',
@@ -184,7 +252,7 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
                     <tr style={{ backgroundColor: '#fff' }}>
                         <td style={{ border: '1px solid #000', padding: '6px' }}>固定費合計</td>
                         <td style={{ border: '1px solid #000', padding: '6px', textAlign: 'right' }}>
-                            {totalFixedCost.toLocaleString()}
+                            {isNaN(totalFixedCost) ? 0 : totalFixedCost.toLocaleString()}
                         </td>
                     </tr>
                 </tbody>
@@ -193,15 +261,16 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
             {/* 下段：生活費残高＆アクション */}
             <div style={{ marginBottom: '15px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', fontSize: '20px', fontWeight: 'bold', borderBottom: '1px solid #000', paddingBottom: '5px' }}>
-                    {/* 【修正】生活費残高の入力は livingExpenseResidual を更新する。value のフォーマットに合わせて、parse 時にカンマを除去する */}
                     <InputField
                         label='生活費残高'
                         unit='円'
                         fontSize='16px'
                         inputFontSize='16px'
                         textAlign='right'
-                        value={livingExpenseResidual === 0 ? '0' : livingExpenseResidual.toLocaleString()}
+                        value={isNaN(livingExpenseResidual) ? '0' : (livingExpenseResidual === 0 ? '0' : livingExpenseResidual.toLocaleString())}
                         onChange={(e) => setLivingExpenseResidual(parseNumber(e.target.value))}
+                        onBlur={(e) => execSafeNumberConversion(e.target.value)}
+                        onCompositionEnd={(e) => execSafeNumberConversion(e.currentTarget.value)}
                     />
                 </div>
             </div>
