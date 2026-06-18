@@ -3,7 +3,6 @@ import { Button } from '../base/Button';
 import { InputField } from '../base/InputField';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toHalfWidth } from '../../utils/StringUtil';
-import { isValidNumber } from '../../utils/Validation';
 
 interface KakeiboSummaryProps {
     carryOver: number;           // 繰越金

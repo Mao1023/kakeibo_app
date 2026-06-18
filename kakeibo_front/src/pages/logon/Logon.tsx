@@ -4,6 +4,7 @@ import { isValidInput } from "../../utils/Validation";
 import { Title } from '../../components/base/Title';
 import { InputField } from '../../components/base/InputField';
 import { Button } from '../../components/base/Button';
+import axios from 'axios';
 
 export const Logon: React.FC = () => {
   // メニュー画面への遷移
@@ -48,17 +49,37 @@ export const Logon: React.FC = () => {
     }
   };
 
-  const handleLogon = () => {
+  const handleLogon = async () => {
     let hasError = false;
+    setLogonError(''); // エラー表示をクリア
+
     if (username.trim() === '') { setUsernameError('ユーザー名を入力してください。'); hasError = true; }
     if (password.trim() === '') { setPasswordError('パスワードを入力してください。'); hasError = true; }
-    if (usernameError || passwordError || logonError) { hasError = true; }
-    if ((username !== '' || password !== '') && (username !== 'maomao' || password !== 'maomaomao')) {
-      setLogonError('ユーザー名かパスワードが間違っています。'); hasError = true;
-    }
-    if (!hasError) {
-      localStorage.setItem('token', 'dummy_key');
-      navigate('/menu');
+    if (usernameError || passwordError) { hasError = true; }
+
+    if (hasError) return;
+
+    try {
+      // 💡 Javaの AuthController のエンドポイントへPOST送信
+      // 第2引数のオブジェクトのキー名が、Java側の LogonRequest DTO のフィールド名と一致します
+      const response = await axios.post('http://localhost:8081/api/auth/logon', {
+        username: username,
+        password: password
+      });
+
+      // 認証成功時（Javaから200 OKが返ってきた場合）
+      if (response.status === 200) {
+        // 必要に応じてトークンなどを保存（現状はダミー)
+        localStorage.setItem('token', 'dummy_key');
+        navigate('/menu');
+      }
+    } catch (error: any) {
+      // 💡 認証失敗時（401 Unauthorizedなど）や接続エラー時のハンドリング
+      if (error.response && error.response.status === 401) {
+        setLogonError('ユーザー名かパスワードが間違っています。');
+      } else {
+        setLogonError('サーバーとの通信に失敗しました。Javaアプリが起動しているか確認してください。');
+      }
     }
   };
 
