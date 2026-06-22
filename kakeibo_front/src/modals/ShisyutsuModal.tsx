@@ -27,7 +27,8 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
     const [itemCategory, setItemCategory] = useState('1');
     const [shisyutsuType, setShisyutsuType] = useState<1 | 2>(2);
     const [shisyutsuName, setShisyutsuName] = useState('');
-    const [shisyutsuAmount, setShisyutsuAmount] = useState('');
+    const [shisyutsuAmount, setShisyutsuAmount] = useState(0);
+    const [amountText, setAmountText] = useState('');
 
     const [shisyutsuNameError, setShisyutsuNameError] = useState('');
     const [shisyutsuAmountError, setShisyutsuAmountError] = useState('');
@@ -54,56 +55,36 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
         setItemCategory('1');
         setShisyutsuType(2);
         setShisyutsuName('');
-        setShisyutsuAmount('');
+        setShisyutsuAmount(0);
+        setAmountText(''); // 💡 次回入力のためにテキストもクリア
         setShisyutsuNameError('');
         setShisyutsuAmountError('');
+    };
+
+    const parseNumber = (value: string): number => {
+        const halfWidth = toHalfWidth(value);
+        const cleanValue = halfWidth.replace(/,/g, '').replace(/[^0-9-]/g, '');
+
+        if (cleanValue === '' || cleanValue === '-') return 0;
+        const num = Number(cleanValue);
+        return isNaN(num) ? 0 : num;
     };
 
     const handleShisyutsuNameChange = (val: string) => {
         setShisyutsuName(val);
         if (!val.trim()) {
             setShisyutsuNameError('支出名を入力してください。');
-        } else if (!isValidLength(val, 1, 255)) {
-            setShisyutsuNameError('255桁以内で入力してください。');
+        } else if (!isValidLength(val, 1, 100)) {
+            setShisyutsuNameError('100桁以内で入力してください。');
         } else {
             setShisyutsuNameError('');
         }
     };
 
-    // 💡 文字列からカンマや不要な日本語ノイズを完全に除去してクリーンな文字列にする安全ガード
-    const cleanNumberString = (value: string): string => {
-        const halfWidth = toHalfWidth(value);
-        // カンマ、および数値以外の文字（日本語・英字など）をすべて抹消
-        return halfWidth.replace(/,/g, '').replace(/[^0-9]/g, '');
-    };
-
-    const handleStartAmountChange = (val: string) => {
-        const cleaned = cleanNumberString(val);
-
-        // 💡 カンマ付きで画面に見せるために3桁区切りの文字列に変換して保持
-        const formatted = cleaned === '' ? '' : Number(cleaned).toLocaleString();
-        setShisyutsuAmount(formatted);
-
-        if (!cleaned.trim()) {
-            setShisyutsuAmountError('支出額を入力してください。');
-        } else {
-            setShisyutsuAmountError(''); // 💡 不要文字は最初から弾かれるため、常時エラーなし
-        }
-    };
-
-    const execHalfWidthConversion = (currentVal: string) => {
-        const cleaned = cleanNumberString(currentVal);
-        const formatted = cleaned === '' ? '' : Number(cleaned).toLocaleString();
-        setShisyutsuAmount(formatted);
-
-        if (!cleaned.trim()) {
-            setShisyutsuAmountError('支出額を入力してください。');
-        } else {
-            setShisyutsuAmountError('');
-        }
-    };
-
     const handleRegister = () => {
+        // 💡 登録直前に最新のテキストから数値を確定させ、Stateを読み取る
+        const finalAmount = parseNumber(amountText) || shisyutsuAmount;
+
         setShisyutsuNameError('');
         setShisyutsuAmountError('');
 
@@ -112,18 +93,15 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
         if (!shisyutsuName.trim()) {
             setShisyutsuNameError('支出名を入力してください。');
             hasError = true;
-        } else if (!isValidLength(shisyutsuName, 1, 255)) {
-            setShisyutsuNameError('255桁以内で入力してください。');
+        } else if (!isValidLength(shisyutsuName, 1, 100)) {
+            setShisyutsuNameError('100桁以内で入力してください。');
             hasError = true;
         }
 
-        // 💡 登録用にカンマを完全に抜いた純粋な数字文字列を取得
-        const rawAmount = shisyutsuAmount.replace(/,/g, '');
-
-        if (!rawAmount.trim()) {
+        if (finalAmount === 0) {
             setShisyutsuAmountError('支出額を入力してください。');
             hasError = true;
-        } else if (!isValidNumber(rawAmount)) {
+        } else if (!isValidNumber(String(finalAmount))) {
             setShisyutsuAmountError('半角数字で入力してください。');
             hasError = true;
         }
@@ -133,13 +111,8 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
         const selectedDay = startDate ? startDate.getDate() : new Date().getDate();
 
         const categoryMapping: { [key: string]: string } = {
-            '1': '食費',
-            '2': '日用品',
-            '3': '交際費',
-            '4': '交通費',
-            '5': '衣服・美容',
-            '6': '趣味・娯楽',
-            '7': 'その他'
+            '1': '食費', '2': '日用品', '3': '交際費',
+            '4': '交通費', '5': '衣服・美容', '6': '趣味・娯楽', '7': 'その他'
         };
 
         const finalCategory = shisyutsuType === 1
@@ -150,7 +123,7 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
             day: selectedDay,
             category: finalCategory,
             name: shisyutsuName,
-            amount: Number(rawAmount) // 💡 カンマなしの安全な数値を格納
+            amount: finalAmount // 💡 ここで確実に読み取りが行われます
         };
 
         onAddExpense(newExpense);
@@ -206,11 +179,15 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
                     unit='円'
                     textAlign='right'
                     inputFontSize='15px'
-                    value={isNaN(Number(shisyutsuAmount)) ? '0' : (Number(shisyutsuAmount) === 0 ? '0' : shisyutsuAmount.toLocaleString())}
-                    onChange={(e) => handleStartAmountChange(e.target.value)}
+                    value={amountText}
+                    onChange={(e) => { setAmountText(e.target.value); }}
+                    onBlur={(e) => {
+                        const num = parseNumber(e.target.value);
+                        // 💡 画面表示をカンマ区切りにしつつ、背後の数値Stateも更新する
+                        setAmountText(num === 0 ? '' : num.toLocaleString());
+                        setShisyutsuAmount(num);
+                    }}
                     errorMessage={shisyutsuAmountError}
-                    onBlur={(e) => execHalfWidthConversion(e.target.value)}
-                    onCompositionEnd={(e) => execHalfWidthConversion(e.currentTarget.value)}
                 />
 
                 <div style={{

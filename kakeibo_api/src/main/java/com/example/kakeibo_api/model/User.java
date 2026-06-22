@@ -1,14 +1,8 @@
 package com.example.kakeibo_api.model;
 
-import java.time.LocalDateTime;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
-
+import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_mst")
@@ -17,9 +11,24 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
-    private String passwordHash;
-    private boolean admin;
-    private LocalDateTime addedDate;
+    @Column(name = "user_id")
+    private Integer userId;
+
+    @Column(name = "user_name", nullable = false, length = 50)
+    private String userName;
+
+    @Column(name = "user_password_hash", nullable = false, length = 255)
+    private String userPasswordHash;
+
+    @Column(name = "user_admin", nullable = false)
+    private Boolean userAdmin = false;
+
+    @Column(name = "user_added_date", nullable = false, updatable = false)
+    private LocalDateTime userAddedDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.userAddedDate = LocalDateTime.now();
+    }
+
 }

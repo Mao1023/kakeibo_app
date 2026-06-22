@@ -1,16 +1,8 @@
 package com.example.kakeibo_api.model;
 
-import java.time.LocalDateTime;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-
+import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "start_mst")
@@ -19,11 +11,24 @@ public class Start {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long yearMonth;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @Column(name = "start_id")
+    private Integer startId;
+
+    @Column(name = "start_year_month", nullable = false)
+    private Integer startYearMonth;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    private Long amount;
-    private LocalDateTime addedDate;
+
+    @Column(name = "start_amount", nullable = false)
+    private Integer startAmount;
+
+    @Column(name = "start_added_date", nullable = false, updatable = false)
+    private LocalDateTime startAddedDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.startAddedDate = LocalDateTime.now();
+    }
 }
