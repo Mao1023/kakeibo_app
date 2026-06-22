@@ -56,7 +56,7 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
         setShisyutsuType(2);
         setShisyutsuName('');
         setShisyutsuAmount(0);
-        setAmountText(''); // 💡 次回入力のためにテキストもクリア
+        setAmountText(''); // 次回入力のためにテキストもクリア
         setShisyutsuNameError('');
         setShisyutsuAmountError('');
     };
@@ -82,7 +82,7 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
     };
 
     const handleRegister = () => {
-        // 💡 登録直前に最新のテキストから数値を確定させ、Stateを読み取る
+        // 登録直前に最新のテキストから数値を確定させ、Stateを読み取る
         const finalAmount = parseNumber(amountText) || shisyutsuAmount;
 
         setShisyutsuNameError('');
@@ -123,7 +123,7 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
             day: selectedDay,
             category: finalCategory,
             name: shisyutsuName,
-            amount: finalAmount // 💡 ここで確実に読み取りが行われます
+            amount: finalAmount // ここで確実に読み取りが行われます
         };
 
         onAddExpense(newExpense);
@@ -183,7 +183,7 @@ export const ShisyutsuModal: React.FC<ShisyutsuModalProps> = ({ showFlag, setSho
                     onChange={(e) => { setAmountText(e.target.value); }}
                     onBlur={(e) => {
                         const num = parseNumber(e.target.value);
-                        // 💡 画面表示をカンマ区切りにしつつ、背後の数値Stateも更新する
+                        // 画面表示をカンマ区切りにしつつ、背後の数値Stateも更新する
                         setAmountText(num === 0 ? '' : num.toLocaleString());
                         setShisyutsuAmount(num);
                     }}

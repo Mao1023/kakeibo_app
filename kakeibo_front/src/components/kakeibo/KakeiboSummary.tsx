@@ -66,7 +66,7 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
         navigate(`/kakeibo/${newYear}/${String(newMonth).padStart(2, '0')}`);
     };
 
-    // 💡 カンマと数字以外の不要な文字列（日本語など）を完全に排除して数値化する安全ガード
+    // カンマと数字以外の不要な文字列（日本語など）を完全に排除して数値化する安全ガード
     const parseNumber = (value: string): number => {
         // 1. 全角を半角に変換
         const halfWidth = toHalfWidth(value);
@@ -75,7 +75,7 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
 
         if (cleanValue === '' || cleanValue === '-') return 0;
         const num = Number(cleanValue);
-        return isNaN(num) ? 0 : num; // 💡 万が一 NaN になったら 0 で安全にフォールバック
+        return isNaN(num) ? 0 : num; // 万が一 NaN になったら 0 で安全にフォールバック
     };
 
     const handleAmountChange = (index: number, value: string) => {
@@ -88,7 +88,7 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
         setFixedCosts(updatedCosts);
     };
 
-    // 💡 特殊入力イベント用のハンドラーも安全にパースを適用
+    // 特殊入力イベント用のハンドラーも安全にパースを適用
     const execSafeNumberConversion = (currentVal: string) => {
         const parsed = parseNumber(currentVal);
         setLivingExpenseResidual(parsed);
@@ -192,7 +192,7 @@ export const KakeiboSummary: React.FC<KakeiboSummaryProps> = ({
                         textAlign='right'
                         fontSize='16px'
                         inputFontSize='16px'
-                        // 💡 表示が NaN の場合は '0' に退避
+                        // 表示が NaN の場合は '0' に退避
                         value={isNaN(initialAmount) ? '0' : (initialAmount === 0 ? '0' : initialAmount.toLocaleString())}
                         onChange={(e) => setInitialAmount(parseNumber(e.target.value))}
                     />

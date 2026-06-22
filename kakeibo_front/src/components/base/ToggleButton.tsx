@@ -30,7 +30,7 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
         transition: 'background-color 0.3s',
     };
 
-    // 💡 中の丸いツマミのスタイル
+    // 中の丸いツマミのスタイル
     const dialStyle: React.CSSProperties = {
         position: 'absolute',
         top: '1px',

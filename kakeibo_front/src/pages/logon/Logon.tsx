@@ -60,7 +60,7 @@ export const Logon: React.FC = () => {
     if (hasError) return;
 
     try {
-      // 💡 Javaの AuthController のエンドポイントへPOST送信
+      // Javaの AuthController のエンドポイントへPOST送信
       // 第2引数のオブジェクトのキー名が、Java側の LogonRequest DTO のフィールド名と一致します
       const response = await axios.post('http://localhost:8081/api/auth/logon', {
         username: username,
@@ -74,7 +74,7 @@ export const Logon: React.FC = () => {
         navigate('/menu');
       }
     } catch (error: any) {
-      // 💡 認証失敗時（401 Unauthorizedなど）や接続エラー時のハンドリング
+      // 認証失敗時（401 Unauthorizedなど）や接続エラー時のハンドリング
       if (error.response && error.response.status === 401) {
         setLogonError('ユーザー名かパスワードが間違っています。');
       } else {

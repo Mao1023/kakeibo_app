@@ -45,4 +45,28 @@ public class AuthController {
         // ユーザー名不在、またはパスワード不一致
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ユーザー名かパスワードが間違っています。");
     }
+
+    @PostMapping("/new")
+    public ResponseEntity<?> signup(@RequestBody LogonRequest request) {
+        // 1. 同名ユーザーの重複チェック
+        Optional<User> existingUser = userRepository.findByUserName(request.getUsername());
+        if (existingUser.isPresent()) {
+            // フロントの「error.response.data」に直接この文字列が渡るようにプレーンテキストで返却
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("既に使われているユーザー名が登録されています。異なるユーザー名を入力してください。");
+        }
+
+        // 2. 新規ユーザーのエンティティ作成と保存
+        User newUser = new User();
+        newUser.setUserName(request.getUsername());
+        newUser.setUserPasswordHash(request.getPassword()); // ※今回は平文保存（のちに暗号化推奨）
+
+        userRepository.save(newUser);
+
+        // 3. 成功レスポンス
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "ユーザー登録が完了しました。");
+        return ResponseEntity.ok(response);
+    }
 }
