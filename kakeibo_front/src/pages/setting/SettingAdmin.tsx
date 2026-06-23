@@ -33,7 +33,7 @@ export const SettingAdmin = () => {
     const [inputAdmin, setInputAdmin] = useState<boolean>(false);
 
     const [isEdit, setIsEdit] = useState(false);
-    const [editingId, setEditingId] = useState<number | null>(null); // 💡 現在編集している項目のID
+    const [editingId, setEditingId] = useState<number | null>(null); // 現在編集している項目のID
 
     const handleEdit = (admin: AccountAdmin) => {
         setIsEdit(true);

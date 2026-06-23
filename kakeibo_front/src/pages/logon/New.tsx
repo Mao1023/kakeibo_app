@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { isValidInput } from '../../utils/Validation';
 import { Button } from '../../components/base/Button';
 import { BackButton } from '../../components/arange/BackButton';
+import axios from 'axios';
 
 export const New = () => {
     // メニュー画面への遷移
@@ -65,23 +66,43 @@ export const New = () => {
         }
     };
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         let hasError = false;
 
         if (username.trim() === '') { setUsernameError('ユーザー名を入力してください。'); hasError = true; }
         if (password.trim() === '') { setPasswordError('パスワードを入力してください。'); hasError = true; }
         if (passwordConfirm.trim() === '') { setPasswordConfirmError('パスワード（確認用）を入力してください。'); hasError = true; }
         if (usernameError || passwordError || passwordConfirmError) { hasError = true; }
-        if (username === 'maomao') {
-            setUsernameError('既に使われているユーザー名が登録されています。異なるユーザー名を入力してください。');
+
+        if (password !== passwordConfirm) {
+            setPasswordConfirmError('パスワード入力欄に入力されたパスワードと異なります。');
             hasError = true;
         }
-        if (password !== passwordConfirm) {
-            setPasswordConfirmError('パスワード入力欄に入力されたパスワードと異なります。'); hasError = true;
-        }
+
+        // エラーがなければバックエンドへ通信
         if (!hasError) {
-            // DB登録完了
-            navigate('/logon');
+            try {
+                // Javaの新規登録API（8081番ポート）を呼び出す
+                await axios.post('http://localhost:8081/api/auth/new', {
+                    username: username,
+                    password: password
+                });
+
+                // 登録成功時
+                alert('ユーザー登録が完了しました！');
+                navigate('/logon');
+
+            } catch (error: any) {
+                console.error('登録失敗:', error);
+
+                // Java側で重複エラー（400 Bad Request）が発生した場合の処理
+                if (error.response && error.response.status === 400) {
+                    // Javaから返ってきたメッセージ「このユーザー名は既に存在します。」を画面にセット
+                    setUsernameError(error.response.data);
+                } else {
+                    alert('サーバーとの通信に失敗しました。時間をおいて再度お試しください。');
+                }
+            }
         }
     };
 

@@ -10,7 +10,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    // 💡 AuthControllerと同じく推奨されるコンストラクタ注入に統一
+    // AuthControllerと同じく推奨されるコンストラクタ注入に統一
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -18,7 +18,7 @@ public class UserService {
     /**
      * ユーザーIDからユーザー情報を取得
      */
-    public Optional<User> findUserById(Integer id) { // 💡 主キーの型をLongからIntegerに修正
+    public Optional<User> findUserById(Integer id) { // 主キーの型をLongからIntegerに修正
         return userRepository.findById(id);
     }
 
@@ -26,7 +26,7 @@ public class UserService {
      * ユーザー名からユーザー情報を取得
      */
     public Optional<User> findUserByName(String name) {
-        // 💡 修正：UserRepository側で作ったメソッド名「findByUserName」に合わせる
+        // 修正：UserRepository側で作ったメソッド名「findByUserName」に合わせる
         return userRepository.findByUserName(name);
     }
 

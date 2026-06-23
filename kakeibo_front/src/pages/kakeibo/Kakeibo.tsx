@@ -48,7 +48,7 @@ export const Kakeibo = () => {
         setShowModal(true);
     };
 
-    // 💡 自動計算ボタンのロジック
+    // 自動計算ボタンのロジック
     const handleAutoCalculate = () => {
         const totalFixedCost = fixedCosts.reduce((sum, item) => sum + item.amount, 0);
         const calculatedResidual = (carryOver + initialAmount) - totalFixedCost;
