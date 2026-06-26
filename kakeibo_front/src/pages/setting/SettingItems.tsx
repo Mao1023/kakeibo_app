@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Title } from '../../components/base/Title';
 import { LogoutButton } from '../../components/arange/LogoutButton';
 import { BackButton } from '../../components/arange/BackButton';
@@ -6,6 +6,7 @@ import { DataTable } from '../../components/base/DataTable';
 import { Button } from '../../components/base/Button';
 import { isValidLength, isValidNumber } from '../../utils/Validation';
 import { SegmentedControl } from '../../components/base/SegmentControl';
+import axios from 'axios';
 
 interface AccountItem {
     id: number;
@@ -16,18 +17,7 @@ interface AccountItem {
 
 export const SettingItems = () => {
     // モックデータを画面内で定義（APIとDB整ったら修正）
-    const [itemsMockData, setItemsMockData] = useState<AccountItem[]>([
-        { id: 1, name: '1', category: 1 },
-        { id: 2, name: '2', category: 1 },
-        { id: 3, name: '3', category: 2, amount: 0 },
-        { id: 4, name: '4', category: 2, amount: 0 },
-        { id: 5, name: '5', category: 1 },
-        { id: 6, name: '6', category: 2, amount: 70000 },
-        { id: 7, name: '7', category: 1 },
-        { id: 8, name: '8', category: 1 },
-        { id: 9, name: '9', category: 1 },
-        { id: 10, name: '10', category: 1 },
-    ]);
+    const [itemsMockData, setItemsMockData] = useState<AccountItem[]>([]);
 
     // 右側の入力フォーム用ステート
     const [inputName, setInputName] = useState(() => {
@@ -44,6 +34,40 @@ export const SettingItems = () => {
     const [isEdit, setIsEdit] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null); // 現在編集している項目のID
 
+    const getUserId = (): number | null => {
+        const id = localStorage.getItem('userId');
+        return id ? Number(id) : null;
+    };
+
+    const fetchItems = async () => {
+        const userId = getUserId();
+        if (!userId) {
+            alert('ログイン情報が見つかりません。再ログインしてください。');
+            return;
+        }
+
+        try {
+            // @RequestParam(userId) で受け取るJava側のインターフェースに合わせる
+            const response = await axios.get(`http://localhost:8081/api/setting/items?userId=${userId}`);
+
+            // Java側エンティティ（Item）のフィールド名をフロントの型（AccountItem）へマッピング
+            const mappedData: AccountItem[] = response.data.map((item: any) => ({
+                id: item.itemId,
+                name: item.itemName,
+                category: item.itemType,
+                amount: item.itemKoteiAmount ?? undefined
+            }));
+            setItemsMockData(mappedData);
+        } catch (error) {
+            console.error('データ取得失敗:', error);
+            alert('データの取得に失敗しました。');
+        }
+    };
+
+    useEffect(() => {
+        fetchItems();
+    }, []);
+
     // ボタン用関数を定義
     const handleEdit = (item: AccountItem) => {
         setIsEdit(true);
@@ -53,89 +77,91 @@ export const SettingItems = () => {
         setInputCategory(item.category);
     };
 
-    const handleUpdate = () => {
+    const handleUpdate = async () => {
         setItemError('');
         setKoteiError('');
 
         let hasError = false;
 
-        if (!inputName.trim()) {
-            setItemError('項目名を入力してください');
-            hasError = true;
-        } else if (!isValidLength(inputName, 1, 50)) {
-            setItemError('50桁以内で入力してください。');
-            hasError = true;
-        }
+        if (!inputName.trim()) { setItemError('項目名を入力してください'); hasError = true; }
+        else if (!isValidLength(inputName, 1, 50)) { setItemError('50桁以内で入力してください。'); hasError = true; }
+
         if (inputCategory === 2) {
-            if (!inputKotei.trim()) {
-                setKoteiError('固定費を入力してください');
-                hasError = true;
-            } else if (!isValidNumber(String(inputKotei))) {
-                setKoteiError('半角数字で入力してください。');
-                hasError = true;
-            }
+            if (!inputKotei.trim()) { setKoteiError('固定費を入力してください'); hasError = true; }
+            else if (!isValidNumber(String(inputKotei))) { setKoteiError('半角数字で入力してください。'); hasError = true; }
         }
+
         if (hasError) return;
         if (editingId === null) return;
 
-        // 配列の中身をループ処理し、対象のIDだけ新しい入力内容に差し替える
-        const updatedList = itemsMockData.map(item => {
-            if (item.id === editingId) {
-                return {
-                    ...item,
-                    name: inputName,
-                    category: inputCategory,
-                    amount: inputCategory === 2 ? Number(inputKotei) : undefined
-                };
-            }
-            return item;
-        });
+        const userId = getUserId();
 
-        setItemsMockData(updatedList);
-        resetForm(); // フォームをクリアして登録モードに戻す
-    };
+        try {
+            // DTO(AccountItemRequest)のフィールド構成に合わせてJSONボディを作成
+            await axios.put(`http://localhost:8081/api/setting/items/${editingId}`, {
+                name: inputName,
+                category: inputCategory,
+                amount: inputCategory === 2 ? Number(inputKotei) : null,
+                userId: userId // さきほどDTOに追加したフィールド
+            });
 
-    const handleDelete = (item: AccountItem) => {
-        if (window.confirm(`${item.name}を削除しますか？`)) {
-            setItemsMockData(itemsMockData.filter(i => i.id !== item.id));
-
-            if (editingId === item.id) resetForm();
+            await fetchItems(); // 再取得して画面リフレッシュ
+            resetForm();
+        } catch (error) {
+            console.error('更新失敗:', error);
+            alert('データの更新に失敗しました。');
         }
     };
 
-    const handleRegister = () => {
+    const handleDelete = async (item: AccountItem) => {
+        if (window.confirm(`${item.name}を削除しますか？`)) {
+            try {
+                await axios.delete(`http://localhost:8081/api/setting/items/${item.id}`);
+                await fetchItems(); // 再取得して画面リフレッシュ
+                if (editingId === item.id) resetForm();
+            } catch (error) {
+                console.error('削除失敗:', error);
+                alert('データの削除に失敗しました。');
+            }
+        }
+    };
+
+    const handleRegister = async () => {
         setItemError('');
         setKoteiError('');
 
         let hasError = false;
 
-        if (!inputName.trim()) {
-            setItemError('項目名を入力してください');
-            hasError = true;
-        } else if (!isValidLength(inputName, 1, 50)) {
-            setItemError('50桁以内で入力してください。');
-            hasError = true;
-        }
+        if (!inputName.trim()) { setItemError('項目名を入力してください'); hasError = true; }
+        else if (!isValidLength(inputName, 1, 50)) { setItemError('50桁以内で入力してください。'); hasError = true; }
 
         if (inputCategory === 2) {
-            if (!inputKotei.trim()) {
-                setKoteiError('固定費を入力してください');
-                hasError = true;
-            } else if (!isValidNumber(String(inputKotei))) {
-                setKoteiError('半角数字で入力してください。');
-                hasError = true;
-            }
+            if (!inputKotei.trim()) { setKoteiError('固定費を入力してください'); hasError = true; }
+            else if (!isValidNumber(String(inputKotei))) { setKoteiError('半角数字で入力してください。'); hasError = true; }
         }
         if (hasError) return;
 
-        const newItem: AccountItem = {
-            id: Date.now(),
-            name: inputName,
-            category: inputCategory,
-            amount: inputCategory === 2 ? Number(inputKotei) : undefined
-        };
-        setItemsMockData([...itemsMockData, newItem]);
-        resetForm();
+        const userId = getUserId();
+        if (!userId) {
+            alert('ログイン情報が見つかりません。再ログインしてください。');
+            return;
+        }
+
+        try {
+            // Java側が @RequestParam で userId を求めているため URL パラメータに付与
+            await axios.post(`http://localhost:8081/api/setting/items?userId=${userId}`, {
+                name: inputName,
+                category: inputCategory,
+                amount: inputCategory === 2 ? Number(inputKotei) : null,
+                userId: userId
+            });
+
+            await fetchItems(); // 再取得して画面リフレッシュ
+            resetForm();
+        } catch (error) {
+            console.error('登録失敗:', error);
+            alert('データの登録に失敗しました。');
+        }
     };
 
     const resetForm = () => {
@@ -144,36 +170,24 @@ export const SettingItems = () => {
         setInputName('');
         setInputCategory(1);
         setInputKotei('0');
-
         setItemError('');
         setKoteiError('');
     };
 
-    // テーブルの列定義（型の指定を追加してエラーを解消）
     const columns = [
         { header: '番号', width: '60px', render: (_: any, idx: number) => idx + 1 },
         { header: '項目名', width: '150px', render: (item: AccountItem) => item.name },
-        {
-            header: '分類',
-            width: '100px',
-            render: (item: AccountItem) => item.category === 1 ? '支出' : '固定費'
-        },
+        { header: '分類', width: '100px', render: (item: AccountItem) => item.category === 1 ? '支出' : '固定費' },
         { header: '固定費金額', width: '120px', render: (item: AccountItem) => item.amount !== undefined ? item.amount.toLocaleString() : 'ー' },
         {
             header: '',
             width: '100px',
             render: (item: AccountItem) => (
                 <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
-                    <button
-                        onClick={() => handleEdit(item)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                    >
+                    <button onClick={() => handleEdit(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                         <i className="fas fa-cog" style={{ fontSize: '18px', color: '#000' }} />
                     </button>
-                    <button
-                        onClick={() => handleDelete(item)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                    >
+                    <button onClick={() => handleDelete(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                         <i className="fas fa-times" style={{ fontSize: '18px', color: '#000' }} />
                     </button>
                 </div>
