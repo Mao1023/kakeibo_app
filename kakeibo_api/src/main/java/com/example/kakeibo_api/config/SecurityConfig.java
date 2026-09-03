@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // ログオンや新規登録など、/api/auth/ 以下のURLは誰でもアクセス可能にする
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/setting/items/**").permitAll()
                         .anyRequest().authenticated())
 
                 // 4. 標準のログイン画面やポップアップの無効化
